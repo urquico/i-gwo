@@ -1,0 +1,23 @@
+1. The existing algorithm's alpha, beta, and delta wolves are initialized to zero  which might introduce bias, especially if the search space is large or not centered around zero.
+
+Wolves Position:
+	[0, 0, Fitness Value]
+
+Simulation:
+	To simulate, show that the default positions of alpha, beta, and delta is set to 0.
+
+Objective: 
+	Have an option to initialize wolves position randomly within the bounds to ensure a more diverse starting point and without bias
+
+
+
+
+
+2. The algorithm faces inefficiency which means that it run longer than necessary even if the optimal solution is already achieved
+
+Simulation: 
+	To simulate, run a 10000 iteration problem then display the number of iteration in which the optimum solution was found.
+
+Objective:
+	Implement a method that stops the algorithm when optimal solution is found
+
