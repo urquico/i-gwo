@@ -3,6 +3,10 @@ import numpy  as np
 
 ############################################################################
 
+# Problem: The algorithm faces inefficiency which means that it run longer than necessary even if the optimal solution is already achieved
+
+############################################################################
+
 # Function
 def target_function():
     return

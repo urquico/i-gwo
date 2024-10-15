@@ -1,0 +1,59 @@
+# Initialize Parameters
+Input pack_size, min_values, max_values, iterations, target_function, start_init
+
+# Initialize Alpha, Beta, and Delta positions
+alpha = [0, 0, fitness_value(target_function)]
+beta = [0, 0, fitness_value(target_function)]
+delta = [0, 0, fitness_value(target_function)]
+
+# Initialize Population
+Set dimension as length of min_values
+If start_init exists:
+	convert start_init to 2D array
+	n_rows = pack_size - number of rows in start_init
+	If n_rows > 0:
+		rows = random values between min and max values
+		Append these rows to start_init
+	Else:
+		Truncate start_init to pack_size
+	fitness_values = target_function(start_init)
+	population = combination(start_init, fitness_values)
+Else:
+	population = random values within min and max values
+	fitness_values = target_function(population)
+	population = combination(population, fitness_values)
+
+# Optimization Loop
+count = 0
+While count <= iterations:
+	# Update pack by fitness
+	a = 2 - count * (2 / iterations)
+	alpha, beta, delta = update_pack(position, alpha, beta, delta)
+	
+	# Update Position
+	Generate r1 and r2 randomly
+	Calculate a and c
+	Calculate alpha, beta, delta distances
+	update x1, x2, x3
+	clip positions within min and max values
+	calculate fitness for updated positions
+	combine and sort updated positions
+
+	# Improve Position
+	Copy population to i_position
+	Build distance matrix as dist_matrix
+	For each position:
+		dist = euclidian_distance(position, updated_position)
+		index = distance within dist_matrix
+		For each dimension:
+			Generate random value
+			Choose random indices ix_1 and ix_2
+			Update i_position with weighted difference
+		Calculate fitness for i_position
+		Compare fitness and update i_position
+
+# Return the best solution found
+Return alpha
+
+
+	

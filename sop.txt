@@ -1,3 +1,7 @@
+Improved-Grey Wolf Optimization Algorithm 
+
+
+
 1. The existing algorithm's alpha, beta, and delta wolves are initialized to zero  which might introduce bias, especially if the search space is large or not centered around zero.
 
 Wolves Position:
