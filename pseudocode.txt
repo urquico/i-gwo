@@ -1,7 +1,7 @@
 # Initialize Parameters
 Input pack_size, min_values, max_values, iterations, target_function, start_init
 
-# Initialize Alpha, Beta, and Delta positions
+# Initialize Alpha, Beta, and Delta positions - PROBLEM
 alpha = [0, 0, fitness_value(target_function)]
 beta = [0, 0, fitness_value(target_function)]
 delta = [0, 0, fitness_value(target_function)]
@@ -23,7 +23,7 @@ Else:
 	fitness_values = target_function(population)
 	population = combination(population, fitness_values)
 
-# Optimization Loop
+# Optimization Loop - PROBLEM
 count = 0
 While count <= iterations:
 	# Update pack by fitness
