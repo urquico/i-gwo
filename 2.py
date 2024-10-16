@@ -37,44 +37,44 @@ def initial_variables(size, min_values, max_values, target_function, start_init 
 ############################################################################
 
 # Function: Initialize Alpha
-# def alpha_position(min_values, max_values, target_function):
-#     alpha       = np.zeros((1, len(min_values) + 1))
-#     alpha[0,-1] = target_function(np.clip(alpha[0,0:alpha.shape[1]-1], min_values, max_values))
-#     return alpha[0,:]
-
-# # Function: Initialize Beta
-# def beta_position(min_values, max_values, target_function):
-#     beta       = np.zeros((1, len(min_values) + 1))
-#     beta[0,-1] = target_function(np.clip(beta[0,0:beta.shape[1]-1], min_values, max_values))
-#     return beta[0,:]
-
-# # Function: Initialize Delta
-# def delta_position(min_values, max_values, target_function):
-#     delta       =  np.zeros((1, len(min_values) + 1))
-#     delta[0,-1] = target_function(np.clip(delta[0,0:delta.shape[1]-1], min_values, max_values))
-#     return delta[0,:]
-
-# randomized wolves position
-
 def alpha_position(min_values, max_values, target_function):
-    dim = len(min_values)
-    alpha = np.random.uniform(min_values, max_values, (1, dim))
-    alpha = np.hstack((alpha, [[target_function(np.clip(alpha[0], min_values, max_values))]]))
+    alpha       = np.zeros((1, len(min_values) + 1))
+    alpha[0,-1] = target_function(np.clip(alpha[0,0:alpha.shape[1]-1], min_values, max_values))
     return alpha[0,:]
 
 # Function: Initialize Beta
 def beta_position(min_values, max_values, target_function):
-    dim = len(min_values)
-    beta = np.random.uniform(min_values, max_values, (1, dim))
-    beta = np.hstack((beta, [[target_function(np.clip(beta[0], min_values, max_values))]]))
+    beta       = np.zeros((1, len(min_values) + 1))
+    beta[0,-1] = target_function(np.clip(beta[0,0:beta.shape[1]-1], min_values, max_values))
     return beta[0,:]
 
 # Function: Initialize Delta
 def delta_position(min_values, max_values, target_function):
-    dim = len(min_values)
-    delta = np.random.uniform(min_values, max_values, (1, dim))
-    delta = np.hstack((delta, [[target_function(np.clip(delta[0], min_values, max_values))]]))
+    delta       =  np.zeros((1, len(min_values) + 1))
+    delta[0,-1] = target_function(np.clip(delta[0,0:delta.shape[1]-1], min_values, max_values))
     return delta[0,:]
+
+# randomized wolves position
+
+# def alpha_position(min_values, max_values, target_function):
+#     dim = len(min_values)
+#     alpha = np.random.uniform(min_values, max_values, (1, dim))
+#     alpha = np.hstack((alpha, [[target_function(np.clip(alpha[0], min_values, max_values))]]))
+#     return alpha[0,:]
+
+# # Function: Initialize Beta
+# def beta_position(min_values, max_values, target_function):
+#     dim = len(min_values)
+#     beta = np.random.uniform(min_values, max_values, (1, dim))
+#     beta = np.hstack((beta, [[target_function(np.clip(beta[0], min_values, max_values))]]))
+#     return beta[0,:]
+
+# # Function: Initialize Delta
+# def delta_position(min_values, max_values, target_function):
+#     dim = len(min_values)
+#     delta = np.random.uniform(min_values, max_values, (1, dim))
+#     delta = np.hstack((delta, [[target_function(np.clip(delta[0], min_values, max_values))]]))
+#     return delta[0,:]
 
 # Function: Updtade Pack by Fitness
 def update_pack(position, alpha, beta, delta):
@@ -182,7 +182,11 @@ def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_v
     
     # print initial position
     print("Initial position:")
-    print(alpha, beta, delta, target_value)
+    print("Alpha Position: ", alpha)
+    print("Beta Position: ", beta)
+    print("Delta Position: ", delta)
+    
+    print("Target Value: ", target_value)
 
     # Plot initial positions
     plot_initial_positions(alpha, beta, delta, target_value)
