@@ -1,7 +1,11 @@
-# Problem not simulated
-
 # Required Libraries
 import numpy  as np
+import matplotlib.pyplot as plt
+
+
+############################################################################
+
+# Problem: The existing algorithm's alpha, beta, and delta wolves are initialized to zero  which might introduce bias, especially if the search space is large or not centered around zero.
 
 ############################################################################
 
@@ -16,11 +20,6 @@ def initial_variables(size, min_values, max_values, target_function, start_init 
     dim = len(min_values)
     if (start_init is not None):
         start_init = np.atleast_2d(start_init)
-        
-        # print start_init
-        print("Original start_init:")
-        print(start_init)
-        
         n_rows     = size - start_init.shape[0]
         if (n_rows > 0):
             rows       = np.random.uniform(min_values, max_values, (n_rows, dim))
@@ -29,18 +28,10 @@ def initial_variables(size, min_values, max_values, target_function, start_init 
             start_init = start_init[:size, :dim]
         fitness_values = target_function(start_init) if hasattr(target_function, 'vectorized') else np.apply_along_axis(target_function, 1, start_init)
         population     = np.hstack((start_init, fitness_values[:, np.newaxis] if not hasattr(target_function, 'vectorized') else fitness_values))
-    
-        # print final start_init
-        print("Final start_init:")
-        print(population)
-        
     else:
         population     = np.random.uniform(min_values, max_values, (size, dim))
         fitness_values = target_function(population) if hasattr(target_function, 'vectorized') else np.apply_along_axis(target_function, 1, population)
         population     = np.hstack((population, fitness_values[:, np.newaxis] if not hasattr(target_function, 'vectorized') else fitness_values))
-        # print final population
-        print("Final population:")
-        print(population)
     return population
 
 ############################################################################
@@ -62,6 +53,28 @@ def delta_position(min_values, max_values, target_function):
     delta       =  np.zeros((1, len(min_values) + 1))
     delta[0,-1] = target_function(np.clip(delta[0,0:delta.shape[1]-1], min_values, max_values))
     return delta[0,:]
+
+# randomized wolves position
+
+# def alpha_position(min_values, max_values, target_function):
+#     dim = len(min_values)
+#     alpha = np.random.uniform(min_values, max_values, (1, dim))
+#     alpha = np.hstack((alpha, [[target_function(np.clip(alpha[0], min_values, max_values))]]))
+#     return alpha[0,:]
+
+# # Function: Initialize Beta
+# def beta_position(min_values, max_values, target_function):
+#     dim = len(min_values)
+#     beta = np.random.uniform(min_values, max_values, (1, dim))
+#     beta = np.hstack((beta, [[target_function(np.clip(beta[0], min_values, max_values))]]))
+#     return beta[0,:]
+
+# # Function: Initialize Delta
+# def delta_position(min_values, max_values, target_function):
+#     dim = len(min_values)
+#     delta = np.random.uniform(min_values, max_values, (1, dim))
+#     delta = np.hstack((delta, [[target_function(np.clip(delta[0], min_values, max_values))]]))
+#     return delta[0,:]
 
 # Function: Updtade Pack by Fitness
 def update_pack(position, alpha, beta, delta):
@@ -136,6 +149,29 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
     return i_position
 
 ############################################################################
+def plot_initial_positions(alpha, beta, delta, target_value):
+    # Extract positions
+    alpha_pos = alpha[:-1]  # Exclude the fitness value
+    beta_pos = beta[:-1]
+    delta_pos = delta[:-1]
+
+    # Plot
+    plt.figure(figsize=(8, 6))
+    plt.scatter(alpha_pos[0], alpha_pos[1], color='r', label='Alpha', s=100)
+    plt.scatter(beta_pos[0], beta_pos[1], color='g', label='Beta', s=100)
+    plt.scatter(delta_pos[0], delta_pos[1], color='b', label='Delta', s=100)
+
+    # Plot target value as a horizontal line
+    if target_value is not None:
+        plt.axhline(y=target_value, color='k', linestyle='--', label=f'Target Value: {target_value}')
+
+    plt.title('Initial Positions of Wolves')
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 
 # Function: iGWO
 def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
@@ -143,21 +179,28 @@ def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_v
     beta     = beta_position (min_values, max_values, target_function)
     delta    = delta_position(min_values, max_values, target_function)
     position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
+    
+    # print initial position
+    print("Initial position:")
+    print("Alpha Position: ", alpha)
+    print("Beta Position: ", beta)
+    print("Delta Position: ", delta)
+    
+    print("Target Value: ", target_value)
+
+    # Plot initial positions
+    plot_initial_positions(alpha, beta, delta, target_value)
+    
     count    = 0
     while (count <= iterations):
         if (verbose == True):
-            print('Iteration = ', count, ' f(x) = ', alpha[-1])     
+            print('Iteration = ', count, ' f(x) = ', alpha[-1])      
         a_linear_component = 2 - count*(2/iterations)
         alpha, beta, delta = update_pack(position, alpha, beta, delta)
         updt_position      = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)      
         position           = improve_position(position, updt_position, min_values, max_values, target_function)
-        if (target_value is not None):
-            if (alpha[-1] <= target_value):
-                count = 2* iterations
-            else:
-                count = count + 1
-        else:
-            count = count + 1       
+       
+        count = count + 1       
     return alpha
 
 ############################################################################
@@ -167,32 +210,24 @@ def easom(variables_values = [0, 0]):
     return func_value
 
 def main():
-    start_init = np.array([
-        [100.90, 100.90],
-        [90.00, 90.00],
-        [80.00, 80.00]
-    ])
-    
-    # iGWO - Parameters
-    parameters = {
-        'pack_size': 5,
-        'min_values': (-5, -5),
-        'max_values': (5, 5),
-        'iterations': 100,
-        'verbose': False, # False to suppress output
-        'start_init': None,
-        # 'start_init': start_init,
-        'target_value': None
-    }
+	# iGWO - Parameters
+	parameters = {
+		'pack_size': 25,
+		'min_values': (-50, -50),
+		'max_values': (50, 50),
+		'iterations': 1000,
+		'verbose': True,
+		'start_init': None,
+		'target_value': -1
+	}
 
+	gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)
 
-    gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)
-
-    # Print Solution
-    variables = gwo[:-1]
-    minimum   = gwo[ -1]
-    print('Variables: ', np.around(variables, 4) , ' Minimum Value Found: ', round(minimum, 4) )
-    print(gwo)
+	# Print Solution
+	variables = gwo[:-1]
+	minimum   = gwo[ -1]
+	print('Variables: ', np.around(variables, 4) , ' Minimum Value Found: ', round(minimum, 4) )
+	print(gwo)
 
 if __name__ == "__main__":
     main()

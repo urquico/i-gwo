@@ -1,10 +1,9 @@
 # Required Libraries
 import numpy  as np
+import time
+import cProfile
 import matplotlib.pyplot as plt
 
-############################################################################
-
-# Problem: The algorithm faces inefficiency which means that it run longer than necessary even if the optimal solution is already achieved
 
 ############################################################################
 
@@ -128,74 +127,82 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
 ############################################################################
 
 # Function: iGWO
-def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_values=[100, 100], iterations=500, target_function=target_function, verbose=True, start_init=None, target_value=None):
-    alpha = alpha_position(min_values, max_values, target_function)
-    beta = beta_position(min_values, max_values, target_function)
-    delta = delta_position(min_values, max_values, target_function)
+def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
+    alpha    = alpha_position(min_values, max_values, target_function)
+    beta     = beta_position (min_values, max_values, target_function)
+    delta    = delta_position(min_values, max_values, target_function)
     position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
-    
-    count = 0
-    found_iteration = []
-    convergence_curve = []  # To store the best fitness value at each iteration
-    while count <= iterations:
-        if verbose:
-            print('Iteration =', count, 'f(x) =', alpha[0], alpha[1], ' = ', alpha[-1])
-        
-        convergence_curve.append(alpha[-1])  # Store the best fitness value
-        
-        a_linear_component = 2 - count * (2 / iterations)
+    count    = 0
+    while (count <= iterations):
+        if (verbose == True):
+            print('Iteration = ', count, ' f(x) = ', alpha[-1])      
+        a_linear_component = 2 - count*(2/iterations)
         alpha, beta, delta = update_pack(position, alpha, beta, delta)
-        updt_position = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)
-        position = improve_position(position, updt_position, min_values, max_values, target_function)
-        
-        if target_value is not None and alpha[-1] <= target_value:
-            found_iteration.append(count)
-        
-        count += 1
-    
-    if found_iteration:
-        print('Optimum solution found at iteration:', found_iteration[0])
-    else:
-        print('Optimum solution not found within the given iterations.')
-    
-    # Plot the convergence curve
-    plt.figure()
-    plt.plot(convergence_curve, label='Convergence Curve')
-    plt.xlabel('Iteration')
-    plt.ylabel('Best Fitness Value')
-    plt.title('Convergence Plot')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-    
+        updt_position      = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)      
+        position           = improve_position(position, updt_position, min_values, max_values, target_function)
+        if (target_value is not None):
+            if (alpha[-1] <= target_value):
+                count = 2* iterations
+            else:
+                count = count + 1
+        else:
+            count = count + 1       
     return alpha
 
 ############################################################################
-def easom(variables_values = [0, 0]):
-    x1, x2     = variables_values
-    func_value = -np.cos(x1)*np.cos(x2)*np.exp(-(x1 - np.pi)**2 - (x2 - np.pi)**2)
-    return func_value
+# Define a high-dimensional target function
+def high_dimensional_target_function(x):
+    return np.sum(x**2)
 
-def main():
-	# iGWO - Parameters
-	parameters = {
-		'pack_size': 25,
-		'min_values': (-50, -50),
-		'max_values': (50, 50),
-		'iterations': 500,
-		'verbose': True,
-		'start_init': None,
-		'target_value': -1
-	}
+# Simulate scalability problem
+def simulate_scalability(dimensions, pack_size, iterations):
+    min_values = [-100] * dimensions
+    max_values = [100] * dimensions
 
-	gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)
+    # Measure execution time
+    start_time = time.time()
+    result = improved_grey_wolf_optimizer(
+        pack_size=pack_size,
+        min_values=min_values,
+        max_values=max_values,
+        iterations=iterations,
+        target_function=high_dimensional_target_function,
+        verbose=False
+    )
+    end_time = time.time()
+    
+    execution_time = end_time - start_time
 
-	# Print Solution
-	variables = gwo[:-1]
-	minimum   = gwo[ -1]
-	print('Variables: ', np.around(variables, 4) , ' Minimum Value Found: ', round(minimum, 4) )
-	print(gwo)
-	
+    print(f"Dimensions: {dimensions}, Pack Size: {pack_size}, Iterations: {iterations}")
+    print(f"Execution Time: {execution_time} seconds")
+    print(f"Best Solution: {result}\n")
+    
+    return execution_time
 
-if __name__ == "__main__":
-    main()
+# Test cases
+test_cases = [
+    (10, 20, 1000),    # Low dimensionality, small population
+    (50, 40, 1000),  # Medium dimensionality, medium population
+    (75, 80, 1000),# High dimensionality, large population
+    (100, 200, 1000)# Very high dimensionality, very large population
+]
+
+# Store results
+execution_times = []
+
+# Run simulations
+for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
+    print(f"Running Test Case {i}/{len(test_cases)}: Dimensions={dimensions}, Pack Size={pack_size}, Iterations={iterations}")
+    execution_time = simulate_scalability(dimensions, pack_size, iterations)
+    execution_times.append((dimensions, pack_size, execution_time))
+
+# Plot results
+dimensions, pack_sizes, times = zip(*execution_times)
+
+plt.figure(figsize=(10, 6))
+plt.plot(dimensions, times, marker='o')
+plt.title('Execution Time vs. Dimensionality')
+plt.xlabel('Dimensionality')
+plt.ylabel('Execution Time (seconds)')
+plt.grid(True)
+plt.show()

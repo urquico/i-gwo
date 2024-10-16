@@ -2,10 +2,9 @@
 import numpy  as np
 import matplotlib.pyplot as plt
 
-
 ############################################################################
 
-# Problem: The existing algorithm's alpha, beta, and delta wolves are initialized to zero  which might introduce bias, especially if the search space is large or not centered around zero.
+# Problem: The algorithm faces inefficiency which means that it run longer than necessary even if the optimal solution is already achieved
 
 ############################################################################
 
@@ -53,28 +52,6 @@ def delta_position(min_values, max_values, target_function):
     delta       =  np.zeros((1, len(min_values) + 1))
     delta[0,-1] = target_function(np.clip(delta[0,0:delta.shape[1]-1], min_values, max_values))
     return delta[0,:]
-
-# randomized wolves position
-
-# def alpha_position(min_values, max_values, target_function):
-#     dim = len(min_values)
-#     alpha = np.random.uniform(min_values, max_values, (1, dim))
-#     alpha = np.hstack((alpha, [[target_function(np.clip(alpha[0], min_values, max_values))]]))
-#     return alpha[0,:]
-
-# # Function: Initialize Beta
-# def beta_position(min_values, max_values, target_function):
-#     dim = len(min_values)
-#     beta = np.random.uniform(min_values, max_values, (1, dim))
-#     beta = np.hstack((beta, [[target_function(np.clip(beta[0], min_values, max_values))]]))
-#     return beta[0,:]
-
-# # Function: Initialize Delta
-# def delta_position(min_values, max_values, target_function):
-#     dim = len(min_values)
-#     delta = np.random.uniform(min_values, max_values, (1, dim))
-#     delta = np.hstack((delta, [[target_function(np.clip(delta[0], min_values, max_values))]]))
-#     return delta[0,:]
 
 # Function: Updtade Pack by Fitness
 def update_pack(position, alpha, beta, delta):
@@ -149,58 +126,48 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
     return i_position
 
 ############################################################################
-def plot_initial_positions(alpha, beta, delta, target_value):
-    # Extract positions
-    alpha_pos = alpha[:-1]  # Exclude the fitness value
-    beta_pos = beta[:-1]
-    delta_pos = delta[:-1]
 
-    # Plot
-    plt.figure(figsize=(8, 6))
-    plt.scatter(alpha_pos[0], alpha_pos[1], color='r', label='Alpha', s=100)
-    plt.scatter(beta_pos[0], beta_pos[1], color='g', label='Beta', s=100)
-    plt.scatter(delta_pos[0], delta_pos[1], color='b', label='Delta', s=100)
-
-    # Plot target value as a horizontal line
-    if target_value is not None:
-        plt.axhline(y=target_value, color='k', linestyle='--', label=f'Target Value: {target_value}')
-
-    plt.title('Initial Positions of Wolves')
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
+# Function: iGWO
+def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_values=[100, 100], iterations=500, target_function=target_function, verbose=True, start_init=None, target_value=None):
+    alpha = alpha_position(min_values, max_values, target_function)
+    beta = beta_position(min_values, max_values, target_function)
+    delta = delta_position(min_values, max_values, target_function)
+    position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
+    
+    count = 0
+    found_iteration = []
+    convergence_curve = []  # To store the best fitness value at each iteration
+    while count <= iterations:
+        if verbose:
+            print('Iteration =', count, 'f(x) =', alpha[0], alpha[1], ' = ', alpha[-1])
+        
+        convergence_curve.append(alpha[-1])  # Store the best fitness value
+        
+        a_linear_component = 2 - count * (2 / iterations)
+        alpha, beta, delta = update_pack(position, alpha, beta, delta)
+        updt_position = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)
+        position = improve_position(position, updt_position, min_values, max_values, target_function)
+        
+        if target_value is not None and alpha[-1] <= target_value:
+            found_iteration.append(count)
+        
+        count += 1
+    
+    if found_iteration:
+        print('Optimum solution found at iteration:', found_iteration[0])
+    else:
+        print('Optimum solution not found within the given iterations.')
+    
+    # Plot the convergence curve
+    plt.figure()
+    plt.plot(convergence_curve, label='Convergence Curve')
+    plt.xlabel('Iteration')
+    plt.ylabel('Best Fitness Value')
+    plt.title('Convergence Plot')
     plt.legend()
     plt.grid(True)
     plt.show()
-
-
-# Function: iGWO
-def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
-    alpha    = alpha_position(min_values, max_values, target_function)
-    beta     = beta_position (min_values, max_values, target_function)
-    delta    = delta_position(min_values, max_values, target_function)
-    position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
     
-    # print initial position
-    print("Initial position:")
-    print("Alpha Position: ", alpha)
-    print("Beta Position: ", beta)
-    print("Delta Position: ", delta)
-    
-    print("Target Value: ", target_value)
-
-    # Plot initial positions
-    plot_initial_positions(alpha, beta, delta, target_value)
-    
-    count    = 0
-    while (count <= iterations):
-        if (verbose == True):
-            print('Iteration = ', count, ' f(x) = ', alpha[-1])      
-        a_linear_component = 2 - count*(2/iterations)
-        alpha, beta, delta = update_pack(position, alpha, beta, delta)
-        updt_position      = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)      
-        position           = improve_position(position, updt_position, min_values, max_values, target_function)
-       
-        count = count + 1       
     return alpha
 
 ############################################################################
@@ -215,7 +182,7 @@ def main():
 		'pack_size': 25,
 		'min_values': (-50, -50),
 		'max_values': (50, 50),
-		'iterations': 1000,
+		'iterations': 500,
 		'verbose': True,
 		'start_init': None,
 		'target_value': -1
@@ -228,6 +195,7 @@ def main():
 	minimum   = gwo[ -1]
 	print('Variables: ', np.around(variables, 4) , ' Minimum Value Found: ', round(minimum, 4) )
 	print(gwo)
+	
 
 if __name__ == "__main__":
     main()
