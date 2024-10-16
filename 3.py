@@ -1,9 +1,10 @@
 # Required Libraries
 import numpy  as np
 import time
-import cProfile
 import matplotlib.pyplot as plt
-
+import cProfile
+import pstats
+import io
 
 ############################################################################
 
@@ -193,16 +194,37 @@ execution_times = []
 # Run simulations
 for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
     print(f"Running Test Case {i}/{len(test_cases)}: Dimensions={dimensions}, Pack Size={pack_size}, Iterations={iterations}")
+    
+    # Profile the function and capture the output
+    pr = cProfile.Profile()
+    pr.enable()
+    simulate_scalability(dimensions, pack_size, iterations)
+    pr.disable()
+    
+    # Create a stream to capture the profiling stats
+    s = io.StringIO()
+    ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+    ps.print_stats(10)  # Print the top 10 functions that took the longest
+    
+    # Display the profiling results
+    print(s.getvalue())
+
+    # Store execution time
     execution_time = simulate_scalability(dimensions, pack_size, iterations)
     execution_times.append((dimensions, pack_size, execution_time))
 
 # Plot results
-dimensions, pack_sizes, times = zip(*execution_times)
+if execution_times:  # Ensure there is data to plot
+    dimensions, pack_sizes, times = zip(*execution_times)
 
-plt.figure(figsize=(10, 6))
-plt.plot(dimensions, times, marker='o')
-plt.title('Execution Time vs. Dimensionality')
-plt.xlabel('Dimensionality')
-plt.ylabel('Execution Time (seconds)')
-plt.grid(True)
-plt.show()
+    plt.figure(figsize=(10, 6))
+    plt.plot(dimensions, times, marker='o')
+    plt.title('Execution Time vs. Dimensionality')
+    plt.xlabel('Dimensionality')
+    plt.ylabel('Execution Time (seconds)')
+    plt.grid(True)
+
+    # Ensure the plot is shown
+    plt.show()
+else:
+    print("No execution times to plot.")
