@@ -1,5 +1,6 @@
 # Required Libraries
 import numpy  as np
+import matplotlib.pyplot as plt
 
 ############################################################################
 
@@ -135,9 +136,12 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     
     count = 0
     found_iteration = []
+    convergence_curve = []  # To store the best fitness value at each iteration
     while count <= iterations:
         if verbose:
-            print('Iteration =', count, 'f(x) =', alpha[-1])
+            print('Iteration =', count, 'f(x) =', alpha[0], alpha[1], ' = ', alpha[-1])
+        
+        convergence_curve.append(alpha[-1])  # Store the best fitness value
         
         a_linear_component = 2 - count * (2 / iterations)
         alpha, beta, delta = update_pack(position, alpha, beta, delta)
@@ -149,10 +153,20 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
         
         count += 1
     
-    if found_iteration is not None:
+    if found_iteration:
         print('Optimum solution found at iteration:', found_iteration[0])
     else:
         print('Optimum solution not found within the given iterations.')
+    
+    # Plot the convergence curve
+    plt.figure()
+    plt.plot(convergence_curve, label='Convergence Curve')
+    plt.xlabel('Iteration')
+    plt.ylabel('Best Fitness Value')
+    plt.title('Convergence Plot')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
     
     return alpha
 
@@ -168,7 +182,7 @@ def main():
 		'pack_size': 25,
 		'min_values': (-50, -50),
 		'max_values': (50, 50),
-		'iterations': 10000,
+		'iterations': 500,
 		'verbose': True,
 		'start_init': None,
 		'target_value': -1
