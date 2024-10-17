@@ -1,0 +1,23 @@
+# Initialize Parameters
+Input pack_size, min_values, max_values, iterations, target_function, start_init
+
+# Initialize Alpha, Beta, and Delta positions
+alpha, beta, delta = initialize_positions(target_function)
+
+# Initialize Population
+population = initialize_population(pack_size, min_values, max_values, start_init, target_function)
+
+# Optimization Loop
+for count in range(iterations):
+    # Update pack by fitness
+    a = 2 - count * (2 / iterations)
+    alpha, beta, delta = update_pack(population, alpha, beta, delta)
+    
+    # Update Position
+    updated_positions = update_positions(population, alpha, beta, delta, min_values, max_values)
+    
+    # Improve Position
+    population = improve_positions(population, updated_positions)
+
+# Return the best solution found
+Return alpha

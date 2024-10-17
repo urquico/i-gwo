@@ -54,6 +54,3 @@ While count <= iterations:
 
 # Return the best solution found
 Return alpha
-
-
-	
