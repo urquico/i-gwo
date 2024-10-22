@@ -1,0 +1,19 @@
+# Function: Improve Position
+Copy position to i_position  # O(n * d)
+Build distance matrix for position  # O(n^2 * d)
+
+For each individual in the population:  # O(n)
+    Calculate distance to updated position  # O(d)
+    Find indices within distance in the distance matrix  # O(n)
+
+    For each dimension:  # O(d)
+        Generate a random value  # O(1)
+        Choose random indices ix_1 and ix_2  # O(1)
+        Update i_position with a weighted difference  # O(1)
+
+    Calculate fitness for i_position  # O(d)
+    Compare fitness and update i_position if necessary  # O(1)
+
+Return improved i_position
+
+# Overall Time Complexity: O(n^2 * d)
