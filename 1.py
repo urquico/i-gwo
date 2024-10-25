@@ -56,25 +56,25 @@ def delta_position(min_values, max_values, target_function):
 
 # randomized wolves position
 
-# def alpha_position(min_values, max_values, target_function):
-#     dim = len(min_values)
-#     alpha = np.random.uniform(min_values, max_values, (1, dim))
-#     alpha = np.hstack((alpha, [[target_function(np.clip(alpha[0], min_values, max_values))]]))
-#     return alpha[0,:]
+def random_alpha_position(min_values, max_values, target_function):
+    dim = len(min_values)
+    alpha = np.random.uniform(min_values, max_values, (1, dim))
+    alpha = np.hstack((alpha, [[target_function(np.clip(alpha[0], min_values, max_values))]]))
+    return alpha[0,:]
 
-# # Function: Initialize Beta
-# def beta_position(min_values, max_values, target_function):
-#     dim = len(min_values)
-#     beta = np.random.uniform(min_values, max_values, (1, dim))
-#     beta = np.hstack((beta, [[target_function(np.clip(beta[0], min_values, max_values))]]))
-#     return beta[0,:]
+# Function: Initialize Beta
+def random_beta_position(min_values, max_values, target_function):
+    dim = len(min_values)
+    beta = np.random.uniform(min_values, max_values, (1, dim))
+    beta = np.hstack((beta, [[target_function(np.clip(beta[0], min_values, max_values))]]))
+    return beta[0,:]
 
-# # Function: Initialize Delta
-# def delta_position(min_values, max_values, target_function):
-#     dim = len(min_values)
-#     delta = np.random.uniform(min_values, max_values, (1, dim))
-#     delta = np.hstack((delta, [[target_function(np.clip(delta[0], min_values, max_values))]]))
-#     return delta[0,:]
+# Function: Initialize Delta
+def random_delta_position(min_values, max_values, target_function):
+    dim = len(min_values)
+    delta = np.random.uniform(min_values, max_values, (1, dim))
+    delta = np.hstack((delta, [[target_function(np.clip(delta[0], min_values, max_values))]]))
+    return delta[0,:]
 
 # Function: Updtade Pack by Fitness
 def update_pack(position, alpha, beta, delta):
@@ -149,11 +149,13 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
     return i_position
 
 ############################################################################
-def plot_initial_positions(alpha, beta, delta, target_value):
+def plot_initial_positions(alpha, beta, delta):
     # Extract positions
     alpha_pos = alpha[:-1]  # Exclude the fitness value
     beta_pos = beta[:-1]
     delta_pos = delta[:-1]
+    
+    target_position = [25, 25] 
 
     # Plot
     plt.figure(figsize=(8, 6))
@@ -162,8 +164,9 @@ def plot_initial_positions(alpha, beta, delta, target_value):
     plt.scatter(delta_pos[0], delta_pos[1], color='b', label='Delta', s=100)
 
     # Plot target value as a horizontal line
-    if target_value is not None:
-        plt.axhline(y=target_value, color='k', linestyle='--', label=f'Target Value: {target_value}')
+    # if target_position is not None:
+    plt.axvline(x=target_position[0], color='k', linestyle='--', label=f'Target X Value: {target_position[0]}')
+    plt.axhline(y=target_position[1], color='k', linestyle='--', label=f'Target Y Value: {target_position[1]}')
 
     plt.title('Initial Positions of Wolves')
     plt.xlabel('X-axis')
@@ -172,12 +175,29 @@ def plot_initial_positions(alpha, beta, delta, target_value):
     plt.grid(True)
     plt.show()
 
-
 # Function: iGWO
-def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
-    alpha    = alpha_position(min_values, max_values, target_function)
-    beta     = beta_position (min_values, max_values, target_function)
-    delta    = delta_position(min_values, max_values, target_function)
+def improved_grey_wolf_optimizer(initialize_random=False, pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
+    alpha, beta, delta = None, None, None
+    if initialize_random: 
+        alpha = random_alpha_position(min_values, max_values, target_function)
+        
+        # Ensure beta is different from alpha
+        while True:
+            beta = random_beta_position(min_values, max_values, target_function)
+            if not np.array_equal(beta[:-1], alpha[:-1]):
+                break
+        
+        # Ensure delta is different from both alpha and beta
+        while True:
+            delta = random_delta_position(min_values, max_values, target_function)
+            if (not np.array_equal(delta[:-1], alpha[:-1]) and 
+                not np.array_equal(delta[:-1], beta[:-1])):
+                break
+    else: 
+        alpha = alpha_position(min_values, max_values, target_function)
+        beta  = beta_position(min_values, max_values, target_function)
+        delta = delta_position(min_values, max_values, target_function)
+    
     position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
     
     # print initial position
@@ -189,12 +209,12 @@ def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_v
     print("Target Value: ", target_value)
 
     # Plot initial positions
-    plot_initial_positions(alpha, beta, delta, target_value)
+    plot_initial_positions(alpha, beta, delta)
     
     count    = 0
     while (count <= iterations):
         if (verbose == True):
-            print('Iteration = ', count, ' f(x) = ', alpha[-1])      
+            print('Iteration = ',  count, alpha[0], alpha[1],'  = ', alpha[-1])      
         a_linear_component = 2 - count*(2/iterations)
         alpha, beta, delta = update_pack(position, alpha, beta, delta)
         updt_position      = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)      
@@ -206,7 +226,7 @@ def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_v
 ############################################################################
 def easom(variables_values = [0, 0]):
     x1, x2     = variables_values
-    func_value = -np.cos(x1)*np.cos(x2)*np.exp(-(x1 - np.pi)**2 - (x2 - np.pi)**2)
+    func_value = -np.cos(x1 - 25)*np.cos(x2 - 25)*np.exp(-(x1 - 25)**2 - (x2 - 25)**2)
     return func_value
 
 def main():
@@ -218,10 +238,11 @@ def main():
 		'iterations': 1000,
 		'verbose': True,
 		'start_init': None,
-		'target_value': -1
+		'target_value': -1,
+		'initialize_random': True # change this to simulate random initialization
 	}
 
-	gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)
+	gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)   
 
 	# Print Solution
 	variables = gwo[:-1]
