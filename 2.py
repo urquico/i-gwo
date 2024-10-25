@@ -155,6 +155,8 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     
     if found_iteration:
         print('Optimum solution found at iteration:', found_iteration[0])
+        # number of redundant iterations
+        print('Number of redundant iterations:', len(found_iteration) - 1)
     else:
         print('Optimum solution not found within the given iterations.')
     
