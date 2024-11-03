@@ -226,20 +226,20 @@ def improved_grey_wolf_optimizer(initialize_random=False, pack_size = 25, min_va
 ############################################################################
 def easom(variables_values = [0, 0]):
     x1, x2     = variables_values
-    func_value = -np.cos(x1 - 25)*np.cos(x2 - 25)*np.exp(-(x1 - 25)**2 - (x2 - 25)**2)
+    func_value = -np.cos(x1)*np.cos(x2)*np.exp(-(x1 - np.pi)**2 - (x2 - np.pi)**2)
     return func_value
 
 def main():
 	# iGWO - Parameters
 	parameters = {
 		'pack_size': 25,
-		'min_values': (-50, -50),
-		'max_values': (50, 50),
+		'min_values': (-5, -5),
+		'max_values': (5, 5),
 		'iterations': 1000,
 		'verbose': True,
 		'start_init': None,
 		'target_value': -1,
-		'initialize_random': True # change this to simulate random initialization
+		'initialize_random': False # change this to simulate random initialization
 	}
 
 	gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)   
