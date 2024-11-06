@@ -1,0 +1,30 @@
+# Initialize state array and index
+int[0..623] MT
+int index = 0
+
+# Seed the generator
+Set seed to Input
+Set MT[0] to seed
+for i from 1 to 623
+    Set MT[i] to last 32 bits of (1812433253 * (MT[i-1] xor (MT[i-1] >> 30)) + i)
+
+# Generate numbers
+for iteration from 0 to N  # N is the number of random numbers you want
+    if index == 0
+        for i from 0 to 623
+            Set y to (MT[i] & 0x80000000) + (MT[(i+1) mod 624] & 0x7fffffff)
+            Set MT[i] to MT[(i + 397) mod 624] xor (y >> 1)
+            if (y mod 2) != 0
+                Set MT[i] to MT[i] xor 2567483615
+
+    # Extract a tempered pseudorandom number
+    Set y to MT[index]
+    Set y to y xor (y >> 11)
+    Set y to y xor ((y << 7) and 2636928640)
+    Set y to y xor ((y << 15) and 4022730752)
+    Set y to y xor (y >> 18)
+
+    Set index to (index + 1) mod 624
+
+    # return the random number
+    return y
