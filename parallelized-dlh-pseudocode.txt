@@ -1,0 +1,12 @@
+# Improve Position
+Copy population to i_position
+Build distance matrix as dist_matrix
+Parallel for each position:
+	dist = euclidian_distance(position, updated_position)
+	index = distance within dist_matrix
+	Parallel for each dimension:
+		Generate random value
+		Choose random indices ix_1 and ix_2
+		Update i_position with weighted difference
+	Calculate fitness for i_position
+	Compare fitness and update i_position

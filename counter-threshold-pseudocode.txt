@@ -1,0 +1,9 @@
+# Optimization Loop
+for count in range(iterations):
+	# Computation of the Moving Average
+move_ave = moving_average(w, fitness_values)
+
+	# … Optimization Process, Fitness, Position, DLH
+
+	# Adjust Counter Threshold
+	Increment count by floor(move_ave)
