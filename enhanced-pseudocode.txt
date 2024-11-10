@@ -1,7 +1,7 @@
 # Initialize Parameters
 Input pack_size, min_values, max_values, iterations, target_function, start_init
 
-# Initialize Alpha, Beta, and Delta positions - PROBLEM
+# Initialize Randomized Alpha, Beta, and Delta positions - OBJECTIVE 1
 Set alpha to mersenne_twister(min_values, max_values, target_function)
 
 # Ensure beta is different from alpha
@@ -16,7 +16,6 @@ while true
     If delta excluding last element is not equal to alpha excluding last element
        and delta excluding last element is not equal to beta excluding last element
         Break the loop
-
 
 # Initialize Population
 Set dimension as length of min_values
