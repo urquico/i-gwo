@@ -12,6 +12,7 @@
     "bohachevsky",
     "branin",
     "bukin",
+    "csvfile",
     "easom",
     "eggholder",
     "euclidian",
@@ -32,7 +33,9 @@
     "schaffer",
     "schwefel",
     "styblinski",
+    "ttest",
     "updt",
+    "Updtade",
     "xlabel",
     "ylabel",
     "zakharov"
