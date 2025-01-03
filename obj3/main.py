@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 import cProfile
 import pstats
 import io
+import multiprocessing as mp
 
 ############################################################################
 
 # Function
-def target_function():
-    return
+def target_function(x):
+    return np.sum(x**2)
 
 ############################################################################
 
@@ -128,7 +129,7 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
 ############################################################################
 
 # Function: iGWO
-def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
+def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = False, start_init = None, target_value = None):   
     alpha    = alpha_position(min_values, max_values, target_function)
     beta     = beta_position (min_values, max_values, target_function)
     delta    = delta_position(min_values, max_values, target_function)
@@ -150,6 +151,32 @@ def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_v
             count = count + 1       
     return alpha
 
+def parallel_i_gwo(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = False, start_init = None, target_value = None):
+    threshold = 50
+    
+    if (len(min_values) > threshold):
+        num_processes = mp.cpu_count()
+        pool = mp.Pool(processes=num_processes)
+        
+        print(f"Running {num_processes} processes")
+        
+        results = [
+            pool.apply_async(improved_grey_wolf_optimizer, args=(iterations // num_processes,))
+            for _ in range(num_processes)
+        ]
+        pool.close()
+        pool.join()
+        
+        solutions = [result.get() for result in results if result.get() is not None]
+        if solutions:
+            best_solution = min(solutions, key=lambda x: x[-1])
+        else:
+            best_solution = improved_grey_wolf_optimizer(pack_size, min_values, max_values, iterations, target_function, verbose, start_init, target_value)
+        
+        return best_solution
+    else:
+        return improved_grey_wolf_optimizer(pack_size, min_values, max_values, iterations, target_function, verbose, start_init, target_value)
+
 ############################################################################
 # Define a high-dimensional target function
 def high_dimensional_target_function(x):
@@ -162,7 +189,7 @@ def simulate_scalability(dimensions, pack_size, iterations):
 
     # Measure execution time
     start_time = time.time()
-    result = improved_grey_wolf_optimizer(
+    result = parallel_i_gwo(
         pack_size=pack_size,
         min_values=min_values,
         max_values=max_values,
@@ -180,52 +207,60 @@ def simulate_scalability(dimensions, pack_size, iterations):
     
     return execution_time
 
-# Test cases
-test_cases = [
-    (10, 20, 1000),    # Low dimensionality, small population
-    (50, 40, 1000),  # Medium dimensionality, medium population
-    (75, 80, 1000),# High dimensionality, large population
-    (100, 200, 1000)# Very high dimensionality, very large population
-]
 
-# Store results
-execution_times = []
+def main():
+    # Test cases
+    test_cases = [
+        (10, 20, 1000),    # Low dimensionality, small population
+        (50, 40, 1000),  # Medium dimensionality, medium population
+        (75, 80, 1000),# High dimensionality, large population
+        (100, 200, 1000),# Very high dimensionality, very large population
+        
+        # (1000, 2000, 1000), # Very high dimensionality, very large population
+        # (10000, 20000, 1000) # Very high dimensionality, very large population
+    ]
 
-# Run simulations
-for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
-    print(f"Running Test Case {i}/{len(test_cases)}: Dimensions={dimensions}, Pack Size={pack_size}, Iterations={iterations}")
-    
-    # Profile the function and capture the output
-    pr = cProfile.Profile()
-    pr.enable()
-    simulate_scalability(dimensions, pack_size, iterations)
-    pr.disable()
-    
-    # Create a stream to capture the profiling stats
-    s = io.StringIO()
-    ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-    ps.print_stats(10)  # Print the top 10 functions that took the longest
-    
-    # Display the profiling results
-    print(s.getvalue())
+    # Store results
+    execution_times = []
 
-    # Store execution time
-    execution_time = simulate_scalability(dimensions, pack_size, iterations)
-    execution_times.append((dimensions, pack_size, execution_time))
+    # Run simulations
+    for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
+        print(f"Running Test Case {i}/{len(test_cases)}: Dimensions={dimensions}, Pack Size={pack_size}, Iterations={iterations}")
+        
+        # Profile the function and capture the output
+        pr = cProfile.Profile()
+        pr.enable()
+        simulate_scalability(dimensions, pack_size, iterations)
+        pr.disable()
+        
+        # Create a stream to capture the profiling stats
+        s = io.StringIO()
+        ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
+        ps.print_stats(10)  # Print the top 10 functions that took the longest
+        
+        # Display the profiling results
+        print(s.getvalue())
 
-# Plot results
-if execution_times:  # Ensure there is data to plot
-    dimensions, pack_sizes, times = zip(*execution_times)
+        # Store execution time
+        execution_time = simulate_scalability(dimensions, pack_size, iterations)
+        execution_times.append((dimensions, pack_size, execution_time))
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(dimensions, times, marker='o')
-    plt.title('Execution Time vs. Dimensionality')
-    plt.xlabel('Dimensionality')
-    plt.ylabel('Execution Time (seconds)')
-    plt.grid(True)
+    # Plot results
+    if execution_times:  # Ensure there is data to plot
+        dimensions, pack_sizes, times = zip(*execution_times)
 
-    # Ensure the plot is shown
-    # plt.show()
-    plt.savefig('obj3/parallel_execution_time_plot.png')
-else:
-    print("No execution times to plot.")
+        plt.figure(figsize=(10, 6))
+        plt.plot(dimensions, times, marker='o')
+        plt.title('Execution Time vs. Dimensionality')
+        plt.xlabel('Dimensionality')
+        plt.ylabel('Execution Time (seconds)')
+        plt.grid(True)
+
+        # Ensure the plot is shown
+        # plt.show()
+        plt.savefig('obj3/parallel_execution_time_plot.png')
+    else:
+        print("No execution times to plot.")
+
+if __name__ == "__main__":
+    main()
