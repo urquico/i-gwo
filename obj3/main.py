@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import cProfile
 import pstats
 import io
-import seaborn as sns
 
 ############################################################################
 
@@ -183,22 +182,10 @@ def simulate_scalability(dimensions, pack_size, iterations):
 
 # Test cases
 test_cases = [
-    (10, 20, 1000),  # 10 dimensions with pack size 20
-    (10, 40, 1000),  # 10 dimensions with pack size 40
-    (10, 80, 1000),  # 10 dimensions with pack size 80
-    (10, 200, 1000), # 10 dimensions with pack size 200
-    (50, 20, 1000),  # 50 dimensions with pack size 20
-    (50, 40, 1000),  # 50 dimensions with pack size 40
-    (50, 80, 1000),  # 50 dimensions with pack size 80
-    (50, 200, 1000), # 50 dimensions with pack size 200
-    (75, 20, 1000),  # 75 dimensions with pack size 20
-    (75, 40, 1000),  # 75 dimensions with pack size 40
-    (75, 80, 1000),  # 75 dimensions with pack size 80
-    (75, 200, 1000), # 75 dimensions with pack size 200
-    (100, 20, 1000), # 100 dimensions with pack size 20
-    (100, 40, 1000), # 100 dimensions with pack size 40
-    (100, 80, 1000), # 100 dimensions with pack size 80
-    (100, 200, 1000) # 100 dimensions with pack size 200
+    (10, 20, 1000),    # Low dimensionality, small population
+    (50, 40, 1000),  # Medium dimensionality, medium population
+    (75, 80, 1000),# High dimensionality, large population
+    (100, 200, 1000)# Very high dimensionality, very large population
 ]
 
 # Store results
@@ -211,7 +198,7 @@ for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
     # Profile the function and capture the output
     pr = cProfile.Profile()
     pr.enable()
-    execution_time = simulate_scalability(dimensions, pack_size, iterations)
+    simulate_scalability(dimensions, pack_size, iterations)
     pr.disable()
     
     # Create a stream to capture the profiling stats
@@ -223,24 +210,22 @@ for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
     print(s.getvalue())
 
     # Store execution time
+    execution_time = simulate_scalability(dimensions, pack_size, iterations)
     execution_times.append((dimensions, pack_size, execution_time))
 
-# Prepare data for heatmap
-heatmap_data = np.zeros((4, 4))  # 4 dimensions x 4 pack sizes
-dimension_labels = [10, 50, 75, 100]
-pack_size_labels = [20, 40, 80, 200]
+# Plot results
+if execution_times:  # Ensure there is data to plot
+    dimensions, pack_sizes, times = zip(*execution_times)
 
-for dimensions, pack_size, execution_time in execution_times:
-    dim_index = dimension_labels.index(dimensions)
-    pack_index = pack_size_labels.index(pack_size)
-    heatmap_data[dim_index, pack_index] = execution_time
+    plt.figure(figsize=(10, 6))
+    plt.plot(dimensions, times, marker='o')
+    plt.title('Execution Time vs. Dimensionality')
+    plt.xlabel('Dimensionality')
+    plt.ylabel('Execution Time (seconds)')
+    plt.grid(True)
 
-# Plot heatmap
-plt.figure(figsize=(10, 8))
-sns.heatmap(heatmap_data, annot=True, fmt=".2f", xticklabels=pack_size_labels, yticklabels=dimension_labels, cmap="YlGnBu")
-plt.title('Execution Time Heatmap (seconds)')
-plt.xlabel('Pack Size')
-plt.ylabel('Dimensions')
-# plt.show()
-plt.savefig('problem3/execution_time_heatmap.png')
-
+    # Ensure the plot is shown
+    # plt.show()
+    plt.savefig('obj3/parallel_execution_time_plot.png')
+else:
+    print("No execution times to plot.")

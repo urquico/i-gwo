@@ -168,7 +168,8 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     plt.title('Convergence Plot')
     plt.legend()
     plt.grid(True)
-    plt.show()
+    # plt.show()
+    plt.savefig('problem2/convergence_plot.png')
     
     return alpha
 

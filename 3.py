@@ -225,6 +225,7 @@ if execution_times:  # Ensure there is data to plot
     plt.grid(True)
 
     # Ensure the plot is shown
-    plt.show()
+    # plt.show()
+    plt.savefig('obj3/normal_execution_time_plot.png')
 else:
     print("No execution times to plot.")

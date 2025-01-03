@@ -173,7 +173,8 @@ def plot_initial_positions(alpha, beta, delta):
     plt.ylabel('Y-axis')
     plt.legend()
     plt.grid(True)
-    plt.show()
+    # plt.show()
+    plt.savefig('problem1/initial_positions_plot.png')
 
 # Function: iGWO
 def improved_grey_wolf_optimizer(initialize_random=False, pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
