@@ -1,0 +1,18 @@
+         2007380 function calls (2003325 primitive calls) in 1.291 seconds
+
+   Ordered by: cumulative time
+   List reduced from 248 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    1.291    1.291 /Users/simplevia/Desktop/i-gwo/obj3/main.py:217(simulate_scalability)
+        1    0.003    0.003    1.291    1.291 /Users/simplevia/Desktop/i-gwo/obj3/main.py:143(improved_grey_wolf_optimizer)
+     1001    0.065    0.000    0.798    0.001 /Users/simplevia/Desktop/i-gwo/obj3/main.py:70(update_position)
+     4004    0.116    0.000    0.680    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/lib/_shape_base_impl.py:278(apply_along_axis)
+   160160    0.107    0.000    0.417    0.000 /Users/simplevia/Desktop/i-gwo/obj3/main.py:213(high_dimensional_target_function)
+        4    0.000    0.000    0.333    0.083 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/process.py:142(join)
+       10    0.000    0.000    0.333    0.033 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/popen_fork.py:24(poll)
+        4    0.000    0.000    0.333    0.083 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/popen_fork.py:36(wait)
+       10    0.333    0.033    0.333    0.033 {built-in method posix.waitpid}
+   160160    0.072    0.000    0.300    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2349(sum)
+
+

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import cProfile
 import pstats
 import io
+import csv
 
 ############################################################################
 
@@ -174,7 +175,7 @@ def simulate_scalability(dimensions, pack_size, iterations):
     
     execution_time = end_time - start_time
 
-    print(f"Dimensions: {dimensions}, Pack Size: {pack_size}, Iterations: {iterations}")
+    # print(f"Dimensions: {dimensions}, Pack Size: {pack_size}, Iterations: {iterations}")
     print(f"Execution Time: {execution_time} seconds")
     print(f"Best Solution: {result}\n")
     
@@ -198,7 +199,7 @@ for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
     # Profile the function and capture the output
     pr = cProfile.Profile()
     pr.enable()
-    simulate_scalability(dimensions, pack_size, iterations)
+    execution_time = simulate_scalability(dimensions, pack_size, iterations)
     pr.disable()
     
     # Create a stream to capture the profiling stats
@@ -207,11 +208,20 @@ for i, (dimensions, pack_size, iterations) in enumerate(test_cases, start=1):
     ps.print_stats(10)  # Print the top 10 functions that took the longest
     
     # Display the profiling results
-    print(s.getvalue())
+    # print(s.getvalue())
 
     # Store execution time
-    execution_time = simulate_scalability(dimensions, pack_size, iterations)
     execution_times.append((dimensions, pack_size, execution_time))
+    
+    # Save the profiling results to a file
+    with open(f'obj3/normal/profiling_results_{dimensions}_{pack_size}_{iterations}.txt', 'w') as file:
+        file.write(s.getvalue())
+
+    # Save the execution time to a csv file
+    with open(f'obj3/normal/execution_time_{dimensions}_{pack_size}_{iterations}.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Dimensions', 'Pack Size', 'Execution Time'])
+        writer.writerow([dimensions, pack_size, execution_time])
 
 # Plot results
 if execution_times:  # Ensure there is data to plot
@@ -226,6 +236,6 @@ if execution_times:  # Ensure there is data to plot
 
     # Ensure the plot is shown
     # plt.show()
-    plt.savefig('obj3/normal_execution_time_plot.png')
+    plt.savefig('obj3/normal/execution_time_plot.png')
 else:
     print("No execution times to plot.")

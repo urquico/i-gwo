@@ -1,0 +1,18 @@
+         3769746 function calls (3765666 primitive calls) in 3.142 seconds
+
+   Ordered by: cumulative time
+   List reduced from 248 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    3.142    3.142 /Users/simplevia/Desktop/i-gwo/obj3/main.py:217(simulate_scalability)
+        1    0.028    0.028    3.141    3.141 /Users/simplevia/Desktop/i-gwo/obj3/main.py:143(improved_grey_wolf_optimizer)
+     1001    0.179    0.000    1.647    0.002 /Users/simplevia/Desktop/i-gwo/obj3/main.py:70(update_position)
+     4004    0.223    0.000    1.355    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/lib/_shape_base_impl.py:278(apply_along_axis)
+     1001    0.002    0.000    1.115    0.001 /Users/simplevia/Desktop/i-gwo/obj3/main.py:112(improve_position)
+     1001    0.977    0.001    1.107    0.001 /Users/simplevia/Desktop/i-gwo/obj3/main.py:106(build_distance_matrix)
+   320320    0.224    0.000    0.867    0.000 /Users/simplevia/Desktop/i-gwo/obj3/main.py:213(high_dimensional_target_function)
+   320320    0.148    0.000    0.623    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2349(sum)
+   321323    0.180    0.000    0.454    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:69(_wrapreduction)
+       10    0.000    0.000    0.338    0.034 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/popen_fork.py:24(poll)
+
+
