@@ -17,46 +17,43 @@ def target_function(x):
 ############################################################################
 
 # Function: Initialize Variables
-def initial_variables(size, min_values, max_values, target_function, start_init, queue):
+def initial_variables(size, min_values, max_values, target_function, start_init = None):
     dim = len(min_values)
-    if start_init is not None:
+    if (start_init is not None):
         start_init = np.atleast_2d(start_init)
-        n_rows = size - start_init.shape[0]
-        if n_rows > 0:
-            rows = np.random.uniform(min_values, max_values, (n_rows, dim))
+        n_rows     = size - start_init.shape[0]
+        if (n_rows > 0):
+            rows       = np.random.uniform(min_values, max_values, (n_rows, dim))
             start_init = np.vstack((start_init[:, :dim], rows))
         else:
             start_init = start_init[:size, :dim]
         fitness_values = target_function(start_init) if hasattr(target_function, 'vectorized') else np.apply_along_axis(target_function, 1, start_init)
-        population = np.hstack((start_init, fitness_values[:, np.newaxis] if not hasattr(target_function, 'vectorized') else fitness_values))
+        population     = np.hstack((start_init, fitness_values[:, np.newaxis] if not hasattr(target_function, 'vectorized') else fitness_values))
     else:
-        population = np.random.uniform(min_values, max_values, (size, dim))
+        population     = np.random.uniform(min_values, max_values, (size, dim))
         fitness_values = target_function(population) if hasattr(target_function, 'vectorized') else np.apply_along_axis(target_function, 1, population)
-        population = np.hstack((population, fitness_values[:, np.newaxis] if not hasattr(target_function, 'vectorized') else fitness_values))
-    queue.put(population)  # Send result to the queue
+        population     = np.hstack((population, fitness_values[:, np.newaxis] if not hasattr(target_function, 'vectorized') else fitness_values))
     return population
 
 ############################################################################
 
 # Function: Initialize Alpha
-def alpha_position(min_values, max_values, target_function, queue):
-    alpha = np.zeros((1, len(min_values) + 1))
-    alpha[0, -1] = target_function(np.clip(alpha[0, 0:alpha.shape[1] - 1], min_values, max_values))
-    queue.put(alpha[0, :])  # Send result to the queue
-    return alpha[0, :]
+def alpha_position(min_values, max_values, target_function):
+    alpha       = np.zeros((1, len(min_values) + 1))
+    alpha[0,-1] = target_function(np.clip(alpha[0,0:alpha.shape[1]-1], min_values, max_values))
+    return alpha[0,:]
 
 # Function: Initialize Beta
-def beta_position(min_values, max_values, target_function, queue):
-    beta = np.zeros((1, len(min_values) + 1))
-    beta[0, -1] = target_function(np.clip(beta[0, 0:beta.shape[1] - 1], min_values, max_values))
-    queue.put(beta[0, :])  # Send result to the queue
-    return beta[0, :]
+def beta_position(min_values, max_values, target_function):
+    beta       = np.zeros((1, len(min_values) + 1))
+    beta[0,-1] = target_function(np.clip(beta[0,0:beta.shape[1]-1], min_values, max_values))
+    return beta[0,:]
+
 # Function: Initialize Delta
-def delta_position(min_values, max_values, target_function, queue):
-    delta = np.zeros((1, len(min_values) + 1))
-    delta[0, -1] = target_function(np.clip(delta[0, 0:delta.shape[1] - 1], min_values, max_values))
-    queue.put(delta[0, :])  # Send result to the queue
-    return delta[0, :]
+def delta_position(min_values, max_values, target_function):
+    delta       =  np.zeros((1, len(min_values) + 1))
+    delta[0,-1] = target_function(np.clip(delta[0,0:delta.shape[1]-1], min_values, max_values))
+    return delta[0,:]
 
 # Function: Updtade Pack by Fitness
 def update_pack(position, alpha, beta, delta):
@@ -114,99 +111,69 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
     dist_matrix = build_distance_matrix(position[:, :-1])
     min_values  = np.array(min_values)
     max_values  = np.array(max_values)
-    
-    threshold = 40
-    
-    if len(min_values) >= threshold:
-        pass
-    else: 
-        for i in range(position.shape[0]):
-            dist = euclidean_distance(position[i, :-1], updt_position[i, :-1])
-            idx  = np.where(dist_matrix[i, :] <= dist)[0]
-            for j in range(len(min_values)):
-                rand             = np.random.rand()
-                ix_1             = np.random.choice(idx)
-                ix_2             = np.random.choice(position.shape[0])
-                i_position[i, j] = np.clip(i_position[i, j] + rand * (position[ix_1, j] - position[ix_2, j]), min_values[j], max_values[j])
-            i_position[i, -1] = target_function(i_position[i, :-1])
-            min_fitness       = min(position[i, -1], updt_position[i, -1], i_position[i, -1])
-            if (updt_position[i, -1] == min_fitness):
-                i_position[i, :] = updt_position[i, :]
-            elif (position[i, -1] == min_fitness):
-                i_position[i, :] = position[i, :]
-                
+    for i in range(position.shape[0]):
+        dist = euclidean_distance(position[i, :-1], updt_position[i, :-1])
+        idx  = np.where(dist_matrix[i, :] <= dist)[0]
+        for j in range(len(min_values)):
+            rand             = np.random.rand()
+            ix_1             = np.random.choice(idx)
+            ix_2             = np.random.choice(position.shape[0])
+            i_position[i, j] = np.clip(i_position[i, j] + rand * (position[ix_1, j] - position[ix_2, j]), min_values[j], max_values[j])
+        i_position[i, -1] = target_function(i_position[i, :-1])
+        min_fitness       = min(position[i, -1], updt_position[i, -1], i_position[i, -1])
+        if (updt_position[i, -1] == min_fitness):
+            i_position[i, :] = updt_position[i, :]
+        elif (position[i, -1] == min_fitness):
+            i_position[i, :] = position[i, :]
     return i_position
 
 ############################################################################
 
-# Function: iGWO
-def improved_grey_wolf_optimizer(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = False, start_init = None, target_value = None):   
-    queue = mp.Queue()
-    
-    # Parallelized alpha, beta, delta, position
-    alpha_p = mp.Process(target=alpha_position, args=(min_values, max_values, target_function, queue))
-    beta_p = mp.Process(target=beta_position, args=(min_values, max_values, target_function, queue))
-    delta_p = mp.Process(target=delta_position, args=(min_values, max_values, target_function, queue))
-    position_p = mp.Process(target=initial_variables, args=(pack_size, min_values, max_values, target_function, start_init, queue))
-    
-    alpha_p.start()
-    beta_p.start()
-    delta_p.start()
-    position_p.start()
-    
-    alpha_p.join()
-    beta_p.join()
-    delta_p.join()
-    position_p.join()
-    
-    alpha    = queue.get()
-    beta     = queue.get()
-    delta    = queue.get()
-    position = queue.get()
-    
-    count    = 0
-    while (count <= iterations):
-        if (verbose == True):
-            print('Iteration = ', count, ' f(x) = ', alpha[-1])      
-        a_linear_component = 2 - count*(2/iterations)
-        alpha, beta, delta = update_pack(position, alpha, beta, delta)
-        updt_position      = update_position(position, alpha, beta, delta, a_linear_component, min_values, max_values, target_function)      
-        position           = improve_position(position, updt_position, min_values, max_values, target_function)
-        if (target_value is not None):
-            if (alpha[-1] <= target_value):
-                count = 2* iterations
-            else:
-                count = count + 1
-        else:
-            count = count + 1       
-    return alpha
+# Function: Optimize Segment
+def optimize_segment(start, end, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value):
+    local_alpha, local_beta, local_delta = alpha, beta, delta
+    local_position = np.copy(position)
+    for count in range(start, end):
+        if verbose:
+            print('Iteration = ', count, ' f(x) = ', local_alpha[-1])
+        a_linear_component = 2 - count * (2 / iterations)
+        local_alpha, local_beta, local_delta = update_pack(local_position, local_alpha, local_beta, local_delta)
+        updt_position = update_position(local_position, local_alpha, local_beta, local_delta, a_linear_component, min_values, max_values, target_function)
+        local_position = improve_position(local_position, updt_position, min_values, max_values, target_function)
+        if target_value is not None and local_alpha[-1] <= target_value:
+            break
+    return local_alpha
 
-# ! Not used, Consider removing later
-def parallel_i_gwo(pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = False, start_init = None, target_value = None):
-    threshold = 40
-    
-    if (len(min_values) >= threshold):
+# Function: iGWO
+def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_values=[100, 100], iterations=500, target_function=target_function, verbose=False, start_init=None, target_value=None):
+    alpha = alpha_position(min_values, max_values, target_function)
+    beta = beta_position(min_values, max_values, target_function)
+    delta = delta_position(min_values, max_values, target_function)
+    position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
+
+    if len(min_values) >= 40:
         num_processes = mp.cpu_count()
         pool = mp.Pool(processes=num_processes)
+        segment_size = iterations // num_processes
         
         print(f"Running {num_processes} processes")
         
         results = [
-            pool.apply_async(improved_grey_wolf_optimizer, args=(iterations // num_processes,))
-            for _ in range(num_processes)
+            pool.apply_async(
+                optimize_segment,
+                args=(i * segment_size, (i + 1) * segment_size, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value)
+            ) for i in range(num_processes)
         ]
         pool.close()
         pool.join()
-        
-        solutions = [result.get() for result in results if result.get() is not None]
-        if solutions:
-            best_solution = min(solutions, key=lambda x: x[-1])
-        else:
-            best_solution = improved_grey_wolf_optimizer(pack_size, min_values, max_values, iterations, target_function, verbose, start_init, target_value)
-        
-        return best_solution
+
+        solutions = [result.get() for result in results]
+        best_solution = min(solutions, key=lambda x: x[-1])
     else:
-        return improved_grey_wolf_optimizer(pack_size, min_values, max_values, iterations, target_function, verbose, start_init, target_value)
+        # Run the optimizer in a single process
+        best_solution = optimize_segment(0, iterations, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value)
+
+    return best_solution
 
 ############################################################################
 # Define a high-dimensional target function

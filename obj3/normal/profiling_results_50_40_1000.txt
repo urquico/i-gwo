@@ -1,0 +1,18 @@
+         38802619 function calls (38798563 primitive calls) in 28.959 seconds
+
+   Ordered by: cumulative time
+   List reduced from 127 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   28.959   28.959 /Users/simplevia/Desktop/i-gwo/3.py:160(simulate_scalability)
+        1    0.012    0.012   28.958   28.958 /Users/simplevia/Desktop/i-gwo/3.py:132(improved_grey_wolf_optimizer)
+     1001   12.048    0.012   28.046    0.028 /Users/simplevia/Desktop/i-gwo/3.py:108(improve_position)
+  4005001    1.537    0.000    9.879    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3369(prod)
+  4245286    3.007    0.000    8.698    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:69(_wrapreduction)
+  2006007    0.997    0.000    5.245    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2250(clip)
+  2015018    0.515    0.000    4.257    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)
+  4245287    4.030    0.000    4.030    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+  2002000    0.859    0.000    3.527    0.000 {method 'clip' of 'numpy.generic' objects}
+  2006007    2.702    0.000    2.702    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/_methods.py:100(_clip)
+
+
