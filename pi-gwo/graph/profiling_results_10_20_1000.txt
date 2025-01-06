@@ -1,0 +1,18 @@
+         5106668 function calls (5102544 primitive calls) in 3.609 seconds
+
+   Ordered by: cumulative time
+   List reduced from 281 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    3.609    3.609 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:222(simulate_scalability)
+        1    0.000    0.000    3.608    3.608 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:168(improved_grey_wolf_optimizer)
+        1    0.005    0.005    3.583    3.583 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:153(optimize_segment)
+     1000    1.293    0.001    3.059    0.003 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:129(improve_position)
+   521025    0.357    0.000    1.013    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:69(_wrapreduction)
+   401000    0.159    0.000    0.994    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3369(prod)
+   204003    0.106    0.000    0.562    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:2250(clip)
+     1000    0.047    0.000    0.503    0.001 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:87(update_position)
+   521032    0.477    0.000    0.477    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+   213005    0.059    0.000    0.465    0.000 /Users/simplevia/Desktop/i-gwo/venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:51(_wrapfunc)
+
+

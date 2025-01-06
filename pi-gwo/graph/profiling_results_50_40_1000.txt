@@ -1,0 +1,18 @@
+         9887 function calls (9735 primitive calls) in 5.878 seconds
+
+   Ordered by: cumulative time
+   List reduced from 520 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        6    0.000    0.000   11.430    1.905 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1117(join)
+    29/15    0.001    0.000   11.412    0.761 {method 'acquire' of '_thread.lock' objects}
+        6    0.000    0.000   11.412    1.902 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1155(_wait_for_tstate_lock)
+        9    0.000    0.000   11.408    1.268 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/connection.py:246(recv)
+     11/9    0.000    0.000   11.407    1.267 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/connection.py:429(_recv_bytes)
+    22/18    0.000    0.000   11.403    0.633 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/connection.py:390(_recv)
+    22/18    5.297    0.241   11.403    0.633 {built-in method posix.read}
+        1    0.000    0.000    5.878    5.878 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:222(simulate_scalability)
+        1    0.000    0.000    5.877    5.877 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:168(improved_grey_wolf_optimizer)
+        1    0.000    0.000    5.876    5.876 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/pool.py:659(join)
+
+
