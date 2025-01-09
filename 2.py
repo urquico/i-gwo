@@ -162,14 +162,14 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     
     # Plot the convergence curve
     plt.figure()
-    plt.plot(convergence_curve, label='Convergence Curve')
+    plt.plot(convergence_curve[:100], label='Convergence Curve')
     plt.xlabel('Iteration')
     plt.ylabel('Best Fitness Value')
     plt.title('Convergence Plot')
     plt.legend()
     plt.grid(True)
     # plt.show()
-    plt.savefig('problem2/convergence_plot.png')
+    plt.savefig('obj2/old_convergence_plot.png')
     
     return alpha
 
@@ -185,7 +185,7 @@ def main():
 		'pack_size': 25,
 		'min_values': (-50, -50),
 		'max_values': (50, 50),
-		'iterations': 500,
+		'iterations': 1000,
 		'verbose': True,
 		'start_init': None,
 		'target_value': -1

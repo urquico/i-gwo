@@ -1,6 +1,7 @@
 # Required Libraries
 import numpy  as np
 import matplotlib.pyplot as plt
+import math
 
 ############################################################################
 
@@ -134,7 +135,14 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     delta = delta_position(min_values, max_values, target_function)
     position = initial_variables(pack_size, min_values, max_values, target_function, start_init)
     
+    # computation of the moving average
+    w = 5
+    threshold = 3
+    fitness_history = []
+    moving_average_list = []
+    
     count = 0
+    iteration_count = 0
     found_iteration = []
     convergence_curve = []  # To store the best fitness value at each iteration
     while count <= iterations:
@@ -142,6 +150,13 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
             print('Iteration =', count, 'f(x) =', alpha[0], alpha[1], ' = ', alpha[-1])
         
         convergence_curve.append(alpha[-1])  # Store the best fitness value
+        fitness_history.append(alpha[-1])
+        moving_average = 0
+        
+        if len(fitness_history) >= w:
+            moving_average = sum(fitness_history[-w:]) / w * 2
+            moving_average_list.append(moving_average)
+            print(f"Moving average: {moving_average}")
         
         a_linear_component = 2 - count * (2 / iterations)
         alpha, beta, delta = update_pack(position, alpha, beta, delta)
@@ -149,9 +164,15 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
         position = improve_position(position, updt_position, min_values, max_values, target_function)
         
         if target_value is not None and alpha[-1] <= target_value:
-            found_iteration.append(count)
+            found_iteration.append(iteration_count)
         
-        count += 1
+        # check if the moving_average is same from the previous one
+        if moving_average_list and moving_average_list[-1] == moving_average:
+            count += threshold
+        else:
+            count += 1
+            
+        iteration_count += 1
     
     if found_iteration:
         print('Optimum solution found at iteration:', found_iteration[0])
@@ -169,7 +190,7 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     plt.legend()
     plt.grid(True)
     # plt.show()
-    plt.savefig('problem2/convergence_plot.png')
+    plt.savefig('obj2/new_convergence_plot.png')
     
     return alpha
 
@@ -185,7 +206,7 @@ def main():
 		'pack_size': 25,
 		'min_values': (-50, -50),
 		'max_values': (50, 50),
-		'iterations': 500,
+		'iterations': 1000,
 		'verbose': True,
 		'start_init': None,
 		'target_value': -1
