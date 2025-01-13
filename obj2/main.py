@@ -1,7 +1,6 @@
 # Required Libraries
 import numpy  as np
 import matplotlib.pyplot as plt
-import math
 
 ############################################################################
 
@@ -206,7 +205,7 @@ def main():
 		'pack_size': 25,
 		'min_values': (-50, -50),
 		'max_values': (50, 50),
-		'iterations': 1000,
+		'iterations': 2000,
 		'verbose': True,
 		'start_init': None,
 		'target_value': -1

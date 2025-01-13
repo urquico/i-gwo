@@ -1,7 +1,8 @@
 # Required Libraries
 import numpy  as np
 import matplotlib.pyplot as plt
-
+from pyMetaheuristic.test_function import easom, ackley, axis_parallel_hyper_ellipsoid, beale, bohachevsky_1, bohachevsky_2, bohachevsky_3, booth, branin_rcos, bukin_6, cross_in_tray, de_jong_1, drop_wave, eggholder, griewangk_8, himmelblau, holder_table, matyas, mccormick, levi_13, rastrigin, rosenbrocks_valley, schaffer_2, schaffer_6, six_hump_camel_back, styblinski_tang, three_hump_camel_back, zakharov
+import csv
 ############################################################################
 
 # Problem: The algorithm faces inefficiency which means that it run longer than necessary even if the optimal solution is already achieved
@@ -11,6 +12,64 @@ import matplotlib.pyplot as plt
 # Function
 def target_function():
     return
+
+target_functions = {
+    "ea": easom,
+    "ack": ackley,
+    "aphe": axis_parallel_hyper_ellipsoid,
+    "be": beale,
+    "bo1": bohachevsky_1,
+    "bo2": bohachevsky_2,
+    "bo3": bohachevsky_3,
+    "boo": booth,
+    "cit": cross_in_tray,
+    "dj1": de_jong_1,
+    "dw": drop_wave,
+    "eh": eggholder,
+    "g8": griewangk_8,
+    "hb": himmelblau,
+    "ht": holder_table,
+    "mat": matyas,
+    "mcc": mccormick,
+    "l13": levi_13,
+    "ra": rastrigin,
+    "rv": rosenbrocks_valley,
+    "sch2": schaffer_2,
+    "sch6": schaffer_6,
+    "shcb": six_hump_camel_back,
+    "st": styblinski_tang,
+    "thcb": three_hump_camel_back,
+    "zak": zakharov
+}
+
+target_values = {
+    "ea": -1,
+    "ack": 0.0,
+    "aphe": 0.0,
+    "be": 4.163,
+    "bo1": 0.0,
+    "bo2": 0.0,
+    "bo3": 0.0,
+    "boo": 3.122,
+    "cit": -2.062,
+    "dj1": 0.0,
+    "dw": -1.0,
+    "eh": -126.423,
+    "g8": 0.0,
+    "hb": 2.248,
+    "ht": -1618728691.846,
+    "mat": 0.0,
+    "mcc": -49.037,
+    "l13": 4.655,
+    "ra": 0.0,
+    "rv": 1.092,
+    "sch2": 0.0,
+    "sch6": 0.0,
+    "shcb": -1.031,
+    "st": -78.332,
+    "thcb": 0.0,
+    "zak": 0.0
+}
 
 ############################################################################
 
@@ -160,24 +219,9 @@ def improved_grey_wolf_optimizer(pack_size=25, min_values=[-100, -100], max_valu
     else:
         print('Optimum solution not found within the given iterations.')
     
-    # Plot the convergence curve
-    plt.figure()
-    plt.plot(convergence_curve, label='Convergence Curve')
-    plt.xlabel('Iteration')
-    plt.ylabel('Best Fitness Value')
-    plt.title('Convergence Plot')
-    plt.legend()
-    plt.grid(True)
-    # plt.show()
-    plt.savefig('obj2/old_convergence_plot.png')
-    
-    return alpha
+    return alpha, found_iteration
 
 ############################################################################
-def easom(variables_values = [0, 0]):
-    x1, x2     = variables_values
-    func_value = -np.cos(x1)*np.cos(x2)*np.exp(-(x1 - np.pi)**2 - (x2 - np.pi)**2)
-    return func_value
 
 def main():
 	# iGWO - Parameters
@@ -186,18 +230,47 @@ def main():
 		'min_values': (-50, -50),
 		'max_values': (50, 50),
 		'iterations': 2000,
-		'verbose': True,
+		'verbose': False,
 		'start_init': None,
-		'target_value': -1
+		'target_value': None
 	}
+ 
+	redundant_iterations = []
+ 
+	# loop through all target functions
+	for target_function_name, target_function in target_functions.items():
+		parameters['target_value'] = target_values[target_function_name]
+		print(target_function_name, parameters['target_value'])
+		gwo, found_iteration = improved_grey_wolf_optimizer(target_function=target_function, **parameters)
+		redundant_iterations.append(len(found_iteration) - 1)
 
-	gwo = improved_grey_wolf_optimizer(target_function = easom, **parameters)
+	# Save redundant iterations to a CSV file
+	with open('obj2/old/redundant_iterations.csv', mode='w', newline='') as file:
+		writer = csv.writer(file)
+		writer.writerow(['Target Function', 'Redundant Iterations'])
+		for target_function_name, redundant_iteration in zip(target_functions.keys(), redundant_iterations):
+			writer.writerow([target_function_name, redundant_iteration])
+
+	# Plot the results for all target functions
+	plt.figure()
+	plt.plot(redundant_iterations)
+	plt.xlabel('Target Function')
+	plt.ylabel('Number of Redundant Iterations')
+	plt.xticks(range(len(target_functions)), list(target_functions.keys()), rotation=45)
+	plt.title('Redundant Iterations for All Target Functions')
+	plt.grid(True)
+	plt.tight_layout()
+	# plt.show()
+	plt.savefig('obj2/old/all_redundant_iterations.png')
 
 	# Print Solution
 	variables = gwo[:-1]
 	minimum   = gwo[ -1]
 	print('Variables: ', np.around(variables, 4) , ' Minimum Value Found: ', round(minimum, 4) )
 	print(gwo)
+    
+
+    
 	
 
 if __name__ == "__main__":
