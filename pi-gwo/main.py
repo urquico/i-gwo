@@ -150,23 +150,47 @@ def improve_position(position, updt_position, min_values, max_values, target_fun
 ############################################################################
 
 # Function: Optimize Segment
-def optimize_segment(start, end, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value):
+def optimize_segment(start, end, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value, w, threshold, fitness_history, moving_average_list):
     local_alpha, local_beta, local_delta = alpha, beta, delta
     local_position = np.copy(position)
-    for count in range(start, end):
+    count = start
+    while count < end:
         if verbose:
             print('Iteration = ', count, ' f(x) = ', local_alpha[-1])
+           
+        fitness_history.append(local_alpha[-1])
+        moving_average = 0
+        
+        if len(fitness_history) >= w:
+            moving_average = sum(fitness_history[-w:]) / w * 2
+            moving_average_list.append(moving_average)
+            print(f"Moving average: {moving_average}")
+            
         a_linear_component = 2 - count * (2 / iterations)
         local_alpha, local_beta, local_delta = update_pack(local_position, local_alpha, local_beta, local_delta)
         updt_position = update_position(local_position, local_alpha, local_beta, local_delta, a_linear_component, min_values, max_values, target_function)
         local_position = improve_position(local_position, updt_position, min_values, max_values, target_function)
         if target_value is not None and local_alpha[-1] <= target_value:
             break
+        
+        # check if the moving_average is same from the previous one
+        if moving_average_list and moving_average_list[-1] == moving_average:
+            count += threshold
+        else:
+            count += 1
+        
     return local_alpha
 
 # Function: iGWO
 def improved_grey_wolf_optimizer(initialize_random=False, pack_size = 25, min_values = [-100,-100], max_values = [100,100], iterations = 500, target_function = target_function, verbose = True, start_init = None, target_value = None):   
     alpha, beta, delta = None, None, None
+    
+    # computation of the moving average
+    w = 5
+    threshold = 3
+    fitness_history = []
+    moving_average_list = []
+    
     if initialize_random: 
         alpha = random_alpha_position(min_values, max_values, target_function)
         
@@ -199,7 +223,7 @@ def improved_grey_wolf_optimizer(initialize_random=False, pack_size = 25, min_va
         results = [
             pool.apply_async(
                 optimize_segment,
-                args=(i * segment_size, (i + 1) * segment_size, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value)
+                args=(i * segment_size, (i + 1) * segment_size, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value, w, threshold, fitness_history, moving_average_list)
             ) for i in range(num_processes)
         ]
         pool.close()
@@ -209,7 +233,7 @@ def improved_grey_wolf_optimizer(initialize_random=False, pack_size = 25, min_va
         best_solution = min(solutions, key=lambda x: x[-1])
     else:
         # Run the optimizer in a single process
-        best_solution = optimize_segment(0, iterations, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value)
+        best_solution = optimize_segment(0, iterations, alpha, beta, delta, position, iterations, min_values, max_values, target_function, verbose, target_value, w, threshold, fitness_history, moving_average_list)
 
     return best_solution
 

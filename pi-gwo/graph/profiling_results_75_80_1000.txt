@@ -1,18 +1,18 @@
-         8160 function calls (8053 primitive calls) in 16.331 seconds
+         7797 function calls (7695 primitive calls) in 6.760 seconds
 
    Ordered by: cumulative time
-   List reduced from 352 to 10 due to restriction <10>
+   List reduced from 349 to 10 due to restriction <10>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-        6    0.001    0.000   48.514    8.086 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1117(join)
-        6    0.000    0.000   48.502    8.084 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1155(_wait_for_tstate_lock)
-    29/15    0.000    0.000   48.502    3.233 {method 'acquire' of '_thread.lock' objects}
-        9    0.000    0.000   32.332    3.592 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/connection.py:246(recv)
-        1    0.000    0.000   16.331   16.331 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:222(simulate_scalability)
-        1    0.000    0.000   16.330   16.330 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:168(improved_grey_wolf_optimizer)
-        1    0.000    0.000   16.329   16.329 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/pool.py:659(join)
-      3/1    0.000    0.000   16.168   16.168 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1018(_bootstrap)
-      3/1    0.000    0.000   16.168   16.168 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1058(_bootstrap_inner)
-      3/1    0.000    0.000   16.168   16.168 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1001(run)
+        6    0.000    0.000   19.723    3.287 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1117(join)
+        6    0.000    0.000   19.707    3.285 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1155(_wait_for_tstate_lock)
+    29/15    0.000    0.000   19.707    1.314 {method 'acquire' of '_thread.lock' objects}
+        9    0.000    0.000   13.079    1.453 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/connection.py:246(recv)
+        1    0.000    0.000    6.760    6.760 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:246(simulate_scalability)
+        1    0.000    0.000    6.759    6.759 /Users/simplevia/Desktop/i-gwo/pi-gwo/main.py:185(improved_grey_wolf_optimizer)
+        1    0.000    0.000    6.758    6.758 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/multiprocessing/pool.py:659(join)
+      3/1    0.000    0.000    6.570    6.570 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1018(_bootstrap)
+      3/1    0.000    0.000    6.570    6.570 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1058(_bootstrap_inner)
+      3/1    0.000    0.000    6.570    6.570 /opt/homebrew/Cellar/python@3.12/3.12.7_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/threading.py:1001(run)
 
 
