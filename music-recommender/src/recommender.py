@@ -52,12 +52,9 @@ class ImplicitRecommender:
         ]
         return artists, scores
 
-
-if __name__ == "__main__":
-    
+def generate_results(user_index: int, recommend_limit: int = 10):
     # 2 - 2100
-    user_index = 5  # specify the user ID 
-
+    
     # load user artists matrix
     user_artists = load_user_artists(Path("../dataset/user_artists.dat"))
 
@@ -73,7 +70,7 @@ if __name__ == "__main__":
     # instantiate recommender, fit, and recommend
     recommender = ImplicitRecommender(artist_retriever, implicit_model)
     recommender.fit(user_artists)
-    artists, scores = recommender.recommend(user_index, user_artists, n=10)
+    artists, scores = recommender.recommend(user_index, user_artists, n=recommend_limit)
     
     # store the top 10 artists that the user has listened to
     top_10_artists = []
@@ -83,7 +80,7 @@ if __name__ == "__main__":
     top_10_scores = []
     # store the top 10 artists that the user has listened to
     user_artists_indices = user_artists[user_index].nonzero()[1]
-    for artist_id in user_artists_indices[:10]:  # limit to top 10
+    for artist_id in user_artists_indices[:recommend_limit]:  # limit to top 10
         artist_name = artist_retriever.get_artist_name_from_id(artist_id)
         top_10_artists.append(artist_name)
         # print(artist_name)
@@ -115,4 +112,6 @@ if __name__ == "__main__":
         writer = csv.writer(file)
         writer.writerow(["Listened Artist", "Recommended Artist", "Score"])
         writer.writerows(table_data)
-   
+
+if __name__ == "__main__":
+    generate_results(user_index=5, recommend_limit=10)
