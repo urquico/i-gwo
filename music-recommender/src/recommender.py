@@ -114,4 +114,5 @@ def generate_results(user_index: int, recommend_limit: int = 10):
         writer.writerows(table_data)
 
 if __name__ == "__main__":
-    generate_results(user_index=5, recommend_limit=10)
+    for user_index in range(2, 11):
+        generate_results(user_index=user_index, recommend_limit=10)
