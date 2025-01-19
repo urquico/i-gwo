@@ -9,7 +9,6 @@ from typing import Tuple, List
 import implicit
 import scipy
 import matplotlib.pyplot as plt
-from tabulate import tabulate
 import csv
 
 from data import load_user_artists, ArtistRetriever
@@ -94,11 +93,8 @@ def generate_results(user_index: int, recommend_limit: int = 10):
     # Combine the listened artists and recommended artists into a list of tuples
     table_data = list(zip(top_10_artists, top_10_recommendations, top_10_scores))
 
-    # Create the table with headers
-    table = tabulate(table_data, headers=["Listened Artist", "Recommended Artist", "Score"])
-
     # Plot the table using matplotlib
-    fig, ax = plt.subplots(figsize=(10, 5))  # Adjust the size as needed
+    ax = plt.subplots(figsize=(10, 5))  # Adjust the size as needed
     ax.axis('tight')
     ax.axis('off')
     ax.table(cellText=table_data, colLabels=["Listened Artist", "Recommended Artist", "Score"], cellLoc='center', loc='center')
