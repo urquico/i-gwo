@@ -25,14 +25,23 @@ for file in files:
     # print the average score if count is not zero
     if count > 0:
         scores.append(total_score / count)
-        print(f"{file}: {total_score / count}")
+        # print(f"{file}: {total_score / count}")
     else:
         print(f"No valid scores found in {file}")
 
-# get the best score
-best_score = max(scores)
-print(f"Best score: {best_score}")
+# get the 10 best scores
+best_scores = sorted(scores, reverse=True)[:10]
 
-# get the file with the best score
-best_file = files[scores.index(best_score)]
-print(f"Best file: {best_file}")
+# get the files with the best scores
+best_files = [files[scores.index(score)] for score in best_scores]
+
+# print the best files
+for file in best_files:
+    print(f"{file}: {scores[files.index(file)]}")
+    
+# save the best files and scores to a csv file
+with open('best_files.csv', 'w') as f:
+    writer = csv.writer(f)
+    writer.writerow(['File', 'Score'])
+    for file, score in zip(best_files, best_scores):
+        writer.writerow([file, score])
