@@ -11,6 +11,7 @@ import scipy
 import matplotlib.pyplot as plt
 import csv
 import unicodedata
+from datetime import datetime
 
 from data import load_user_artists, ArtistRetriever
 
@@ -61,7 +62,7 @@ class ImplicitRecommender:
         ]
         return artists, scores
 
-def generate_results(user_index: int, recommend_limit: int = 10):
+def generate_results(user_index: int, recommend_limit: int = 10, factors: int = 50, iterations: int = 10, regularization: float = 0.01):
     # 2 - 2100
     
     # load user artists matrix
@@ -73,7 +74,7 @@ def generate_results(user_index: int, recommend_limit: int = 10):
 
     # instantiate ALS using implicit
     implicit_model = implicit.als.AlternatingLeastSquares(
-        factors=50, iterations=10, regularization=0.01
+        factors=factors, iterations=iterations, regularization=regularization
     )
 
     # instantiate recommender, fit, and recommend
@@ -119,17 +120,27 @@ def generate_results(user_index: int, recommend_limit: int = 10):
     # Wrap text in cells
     for (row, col), cell in table.get_celld().items():
         cell.set_text_props(wrap=True)
+        
+    # create folder for specific user
+    Path(f"results/user_{user_index}").mkdir(parents=True, exist_ok=True)
+    
+    time_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Save the table as an image based on the user ID
-    plt.savefig(f"results/result_user_{user_index}.png", bbox_inches='tight', dpi=300)
+    plt.savefig(f"results/user_{user_index}/time_{time_stamp}_factors_{factors}_iterations_{iterations}_regularization_{regularization}.png", bbox_inches='tight', dpi=300)
     plt.close()
 
+    # create csv folder for specific user
+    Path(f"results/user_{user_index}/csv").mkdir(parents=True, exist_ok=True)
+
     # Save the table as a CSV file inside the results folder
-    with io.open(f"results/result_user_{user_index}.csv", mode='w', newline='', encoding='utf-8') as file:
+    with io.open(f"results/user_{user_index}/csv/time_{time_stamp}_factors_{factors}_iterations_{iterations}_regularization_{regularization}.csv", mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(["Listened Artist", "Recommended Artist", "Score"])
         for row in table_data:
             writer.writerow([unicode_to_ascii(str(cell)) for cell in row])
+            
+    print(f"Results saved for user {user_index} with factors {factors}, iterations {iterations}, and regularization {regularization}")
 
 def evaluate_recommendations(user_index: int, recommend_limit: int = 50):
     # Load user artists matrix
@@ -156,33 +167,28 @@ def evaluate_recommendations(user_index: int, recommend_limit: int = 50):
         for artist_id in actual_artists_indices[:recommend_limit]
     ]
 
-    # Calculate precision, recall, and F1-score
-    precision, recall, f1_score = calculate_precision_recall_f1(actual_artists, recommended_artists)
-    
-    # save the results to a csv file
-    with io.open(f"results/evaluation_user_{user_index}.csv", mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Precision", "Recall", "F1-Score"])
-        writer.writerow([precision, recall, f1_score])
-    
-    print(f"User {user_index} - Precision: {precision}, Recall: {recall}, F1-Score: {f1_score}")
-
-def calculate_precision_recall_f1(actual_items: List[str], recommended_items: List[str]) -> Tuple[float, float, float]:
-    actual_set = set(actual_items)
-    recommended_set = set(recommended_items)
-
-    true_positives = len(actual_set & recommended_set)
-    false_positives = len(recommended_set - actual_set)
-    false_negatives = len(actual_set - recommended_set)
-
-    precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
-    recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
-    f1_score = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-
-    return precision, recall, f1_score
-
 if __name__ == "__main__":
-    for user_index in range(2, 11):
-        generate_results(user_index=user_index, recommend_limit=10)
-        evaluate_recommendations(user_index=user_index, recommend_limit=10)
+    # Define the ranges for each parameter
+    factors_range = range(10, 101, 10)  # Factors from 10 to 100
+    iterations_range = range(10, 101, 10)  # Iterations from 10 to 100
+    regularization_range = [0.001, 0.01, 0.1, 1.0]  # Regularization values
 
+    best_score = 0
+    best_params = None
+
+    for factors in factors_range:
+        for iterations in iterations_range:
+            for regularization in regularization_range:
+                for user_index in range(5, 6):
+                    model = implicit.als.AlternatingLeastSquares(
+                        factors=factors, iterations=iterations, regularization=regularization
+                    )
+                    
+                    # Generate results for each combination of parameters
+                    generate_results(
+                        user_index=user_index,
+                        recommend_limit=10,
+                        factors=factors,
+                        iterations=iterations,
+                        regularization=regularization
+                    )
