@@ -13,8 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import unicodedata
-
+import pandas as pd
 from data import load_user_artists, ArtistRetriever
+from multiprocessing import Pool
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 plt.rcParams['font.family'] = 'DejaVu Sans'
@@ -216,22 +217,37 @@ def optimize_model_parameters(user_artists_matrix):
         target_function=target_function,
         verbose=True
     )
+    
+    # save the best parameters to a CSV file
 
     return int(best_params[0]), best_params[1]  # factors, regularization
 
 def generate_results(user_index: int, recommend_limit: int = 10):
     logging.info(f"Generating results for user {user_index}")
     
+    pool = Pool(processes=10)
+    pool.close()
+    pool.terminate()
+    pool.join()
+
+
     # load user artists matrix
     user_artists = load_user_artists(Path("../../dataset/user_artists.dat"))
 
     # instantiate artist retriever
     artist_retriever = ArtistRetriever()
     artist_retriever.load_artists(Path("../../dataset/artists.dat"))
+    
+    # get the best parameters from the CSV file
+    best_params = pd.read_csv("results/optimized_params.csv")
+    factors = int(best_params.iloc[0]['factors'])
+    regularization = float(best_params.iloc[0]['regularization'])
+    
 
-    # Optimize model parameters using IGWO
-    factors, regularization = optimize_model_parameters(user_artists)
+
+    # Optimize model parameters using IGWO Created Parameters
     logging.info(f"Using parameters: factors={factors}, regularization={regularization}")
+
 
     # instantiate ALS using implicit with optimized parameters
     implicit_model = implicit.als.AlternatingLeastSquares(
@@ -263,37 +279,31 @@ def generate_results(user_index: int, recommend_limit: int = 10):
     # Combine the listened artists and recommended artists into a list of tuples
     table_data = list(zip(top_10_artists, top_10_recommendations, top_10_scores))
 
-    # Plot the table using matplotlib
-    fig, ax = plt.subplots(figsize=(12, 6))  # Increased figure size
-    ax.axis('tight')
-    ax.axis('off')
-    
-    # Create a table with ASCII representation of Unicode strings
-    cell_text = [[unicode_to_ascii(str(cell)) for cell in row] for row in table_data]
-    table = ax.table(cellText=cell_text, colLabels=["Listened Artist", "Recommended Artist", "Score"], 
-                     cellLoc='center', loc='center', colWidths=[0.4, 0.4, 0.2])
-    
-    # Adjust font size and wrapping
-    table.auto_set_font_size(False)
-    table.set_fontsize(8)
-    table.auto_set_column_width(col=list(range(3)))
-
-    # Wrap text in cells
-    for (row, col), cell in table.get_celld().items():
-        cell.set_text_props(wrap=True)
-
-    # Save the table as an image based on the user ID
-    plt.savefig(f"results/result_user_{user_index}.png", bbox_inches='tight', dpi=300)
-    plt.close()
-
-    # Save the table as a CSV file inside the results folder
-    with io.open(f"results/result_user_{user_index}.csv", mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Listened Artist", "Recommended Artist", "Score"])
-        for row in table_data:
-            writer.writerow([unicode_to_ascii(str(cell)) for cell in row])
-
     logging.info(f"Results generated for user {user_index}")
+
+    # format the data
+    formatted_results = process_table_data(table_data)
+    
+    # save the formatted results to a CSV file
+    with open(f"results/recommendation_list_user_{user_index}.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["artist", "score"])
+        for row in formatted_results:
+            writer.writerow(row)
+    
+    return {
+        "user_index": user_index,
+        "recommendation_list": formatted_results
+    }
+
+
+def process_table_data(table_data):
+    """Process the table data into the desired format."""
+    processed_data = [
+        {"artist": artist2, "score": round(float(score), 4)}
+        for _, artist2, score in table_data
+    ]
+    return processed_data
 
 def evaluate_recommendations(user_index: int, recommend_limit: int = 50):
     logging.info(f"Evaluating recommendations for user {user_index}")
