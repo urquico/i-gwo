@@ -28,10 +28,12 @@ def compare_normal_randomized(target_function: str):
 	# calculate the average	
 	average_normal = sum(normal) / len(normal)
 	average_randomized = sum(randomized) / len(randomized)
-
+	improvement = (average_normal - average_randomized) / average_normal * 100
+ 
 	print(f'Average Normal: {average_normal:.2f} seconds')
 	print(f'Average Randomized: {average_randomized:.2f} seconds')
-
+	print(f'Improvement: {improvement:.2f}%')
+ 
 if __name__ == "__main__":
 	compare_normal_randomized("eggholder")
 	compare_normal_randomized("holder_table")
