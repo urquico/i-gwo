@@ -25,9 +25,6 @@ def compare_normal_randomized(target_function: str):
 	normal = data['Normal'].tolist()
 	randomized = data['Randomized'].tolist()
  
-	print(normal)
-	print(randomized)
- 
 	# calculate the average	
 	average_normal = sum(normal) / len(normal)
 	average_randomized = sum(randomized) / len(randomized)
